@@ -1,7 +1,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { Participant } from '../types';
-import { parseNames, MOCK_NAMES, getDuplicateIds } from '../utils/helpers';
+import { parseNames, MOCK_NAMES, getDuplicateIds, exportParticipantsToCSV } from '../utils/helpers';
 
 interface Props {
   participants: Participant[];
@@ -74,14 +74,14 @@ const ParticipantManager: React.FC<Props> = ({ participants, onUpdate }) => {
             </svg>
             名單輸入
           </h2>
-          <button 
+          <button
             onClick={handleLoadMockData}
             className="text-sm font-medium text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition-colors"
           >
             💡 載入範例名單
           </button>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-4">
             <label className="block text-sm font-medium text-slate-700">貼上姓名 (以換行或逗號分隔)</label>
@@ -134,23 +134,36 @@ const ParticipantManager: React.FC<Props> = ({ participants, onUpdate }) => {
             )}
           </div>
           {participants.length > 0 && (
-            <button onClick={handleClear} className="text-sm text-slate-400 hover:text-red-500 font-medium transition-colors">
-              清空全部
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => exportParticipantsToCSV(participants)}
+                className="text-sm text-indigo-600 bg-indigo-50 hover:bg-indigo-100 font-medium px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                匯出 CSV
+              </button>
+              <button
+                onClick={handleClear}
+                className="text-sm text-slate-400 hover:text-red-500 font-medium transition-colors border-l border-slate-200 pl-3"
+              >
+                清空全部
+              </button>
+            </div>
           )}
         </div>
-        
+
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 max-h-96 overflow-y-auto p-1">
           {participants.map((p) => {
             const isDuplicate = duplicateIds.has(p.id);
             return (
-              <div 
-                key={p.id} 
-                className={`group relative border px-3 py-2 rounded-lg flex items-center justify-between transition-all ${
-                  isDuplicate 
-                    ? 'bg-red-50 border-red-200 hover:border-red-400' 
-                    : 'bg-slate-50 border-slate-200 hover:border-indigo-300'
-                }`}
+              <div
+                key={p.id}
+                className={`group relative border px-3 py-2 rounded-lg flex items-center justify-between transition-all ${isDuplicate
+                  ? 'bg-red-50 border-red-200 hover:border-red-400'
+                  : 'bg-slate-50 border-slate-200 hover:border-indigo-300'
+                  }`}
               >
                 <div className="flex items-center gap-2 overflow-hidden">
                   {isDuplicate && (
